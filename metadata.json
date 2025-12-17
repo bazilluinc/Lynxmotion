@@ -1,0 +1,5 @@
+{
+  "name": "Lynx Motion",
+  "description": "An AI-powered video generator using Google's Veo models. Create stunning videos from text prompts and images.",
+  "requestFramePermissions": []
+}
