@@ -8,9 +8,11 @@ import { generateVideo } from './services/geminiService';
 const App: React.FC = () => {
   const [videos, setVideos] = useState<GeneratedVideo[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showAuthError, setShowAuthError] = useState(false);
 
   const handleGenerate = async (prompt: string, imageBase64?: string, imageMimeType?: string) => {
     setIsGenerating(true);
+    setShowAuthError(false);
     
     // Create a temporary ID and initial state
     const newVideoId = Date.now().toString();
@@ -38,10 +40,17 @@ const App: React.FC = () => {
           ? { ...v, status: 'completed', videoUrl: result.videoUri } 
           : v
       ));
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error.message || "Generation failed";
+      const isAuthError = errorMessage.includes("Requested entity was not found") || errorMessage.includes("404");
+      
+      if (isAuthError) {
+        setShowAuthError(true);
+      }
+
       setVideos(prev => prev.map(v => 
         v.id === newVideoId 
-          ? { ...v, status: 'failed', error: 'Generation failed' } 
+          ? { ...v, status: 'failed', error: errorMessage } 
           : v
       ));
     } finally {
@@ -49,9 +58,36 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSwitchKey = async () => {
+    const aistudio = (window as any).aistudio;
+    if (aistudio && aistudio.openSelectKey) {
+      await aistudio.openSelectKey();
+      setShowAuthError(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-indigo-500/30 relative">
       <Header />
+
+      {showAuthError && (
+         <div className="fixed top-20 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:w-auto z-50 animate-in fade-in slide-in-from-top-4">
+            <div className="bg-red-500/10 border border-red-500/50 backdrop-blur-md text-red-100 px-6 py-4 rounded-xl shadow-2xl flex flex-col md:flex-row items-center gap-4">
+               <div className="flex items-center gap-3">
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                 </svg>
+                 <span className="text-sm font-medium">Authentication Failed: Veo model not found (404).</span>
+               </div>
+               <button 
+                 onClick={handleSwitchKey}
+                 className="whitespace-nowrap bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-lg shadow-red-600/20"
+               >
+                 Switch API Key
+               </button>
+            </div>
+         </div>
+      )}
 
       <main className="pt-24 pb-40 px-4 max-w-4xl mx-auto min-h-screen flex flex-col">
         {videos.length === 0 ? (

@@ -50,8 +50,12 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
     }
 
     return { videoUri };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Video generation failed:", error);
+    // Enhance error message for common 404 case with Veo
+    if (error.message?.includes("404") || error.message?.includes("Requested entity was not found") || JSON.stringify(error).includes("Requested entity was not found")) {
+      throw new Error("Requested entity was not found. The API key may not have access to the Veo model. Please try selecting a different API key.");
+    }
     throw error;
   }
 };
