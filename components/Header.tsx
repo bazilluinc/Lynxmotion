@@ -13,7 +13,7 @@ export const Header: React.FC = () => {
       </div>
       <div className="ml-auto">
         <div className="px-3 py-1 bg-white/5 rounded-full text-xs font-medium text-neutral-400 border border-white/10">
-          Veo 3.1
+          Gemini 3 Powered
         </div>
       </div>
     </header>

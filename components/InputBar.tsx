@@ -169,7 +169,7 @@ export const InputBar: React.FC<InputBarProps> = ({ onGenerate, isGenerating }) 
         </div>
         <div className="text-center mt-2">
             <p className="text-[10px] text-neutral-600">
-                Videos are generated using Google's Veo model. Content may be inaccurate or inappropriate.
+                Videos are generated using AI. Content may be inaccurate or inappropriate.
             </p>
         </div>
       </div>

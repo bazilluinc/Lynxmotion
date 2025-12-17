@@ -20,7 +20,7 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
     if (params.imageBase64 && params.imageMimeType) {
       // Image + Text generation
       operation = await ai.models.generateVideos({
-        model: 'veo-3.1-fast-generate-preview',
+        model: 'veo-3.1-generate-preview',
         prompt: params.prompt,
         image: {
           imageBytes: params.imageBase64,
@@ -31,7 +31,7 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
     } else {
       // Text only generation
       operation = await ai.models.generateVideos({
-        model: 'veo-3.1-fast-generate-preview',
+        model: 'veo-3.1-generate-preview',
         prompt: params.prompt,
         config: config,
       });
@@ -52,10 +52,6 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
     return { videoUri };
   } catch (error: any) {
     console.error("Video generation failed:", error);
-    // Enhance error message for common 404 case with Veo
-    if (error.message?.includes("404") || error.message?.includes("Requested entity was not found") || JSON.stringify(error).includes("Requested entity was not found")) {
-      throw new Error("Requested entity was not found. The API key may not have access to the Veo model. Please try selecting a different API key.");
-    }
     throw error;
   }
 };
