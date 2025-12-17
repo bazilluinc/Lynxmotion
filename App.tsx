@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { ApiKeyGate } from './components/ApiKeyGate';
 import { Header } from './components/Header';
 import { InputBar } from './components/InputBar';
 import { VideoCard } from './components/VideoCard';
@@ -7,12 +6,8 @@ import { GeneratedVideo } from './types';
 import { generateVideo } from './services/geminiService';
 
 const App: React.FC = () => {
-  const [hasApiKey, setHasApiKey] = useState(false);
   const [videos, setVideos] = useState<GeneratedVideo[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-
-  // Scroll to bottom helper could be added here if needed, 
-  // but standard reversed list (newest first) works well for this.
 
   const handleGenerate = async (prompt: string, imageBase64?: string, imageMimeType?: string) => {
     setIsGenerating(true);
@@ -53,10 +48,6 @@ const App: React.FC = () => {
       setIsGenerating(false);
     }
   };
-
-  if (!hasApiKey) {
-    return <ApiKeyGate onKeySelected={() => setHasApiKey(true)} />;
-  }
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-indigo-500/30">
