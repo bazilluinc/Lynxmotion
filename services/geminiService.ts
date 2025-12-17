@@ -10,6 +10,10 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
 
   let operation;
 
+  // Use the fast model as it is the general purpose video generation model
+  // and supports the simple image input parameter structure used below.
+  const model = 'veo-3.1-fast-generate-preview';
+
   const config = {
     numberOfVideos: 1,
     resolution: '720p',
@@ -20,7 +24,7 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
     if (params.imageBase64 && params.imageMimeType) {
       // Image + Text generation
       operation = await ai.models.generateVideos({
-        model: 'veo-3.1-generate-preview',
+        model: model,
         prompt: params.prompt,
         image: {
           imageBytes: params.imageBase64,
@@ -31,7 +35,7 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
     } else {
       // Text only generation
       operation = await ai.models.generateVideos({
-        model: 'veo-3.1-generate-preview',
+        model: model,
         prompt: params.prompt,
         config: config,
       });
@@ -52,6 +56,9 @@ export const generateVideo = async (params: VideoGenerationParams): Promise<Gene
     return { videoUri };
   } catch (error: any) {
     console.error("Video generation failed:", error);
+    if (error.message?.includes("404") || error.message?.includes("NOT_FOUND")) {
+        throw new Error("The video model was not found (404). This usually means the API key does not have access to Veo. Please ensure Veo is enabled in your Google Cloud project.");
+    }
     throw error;
   }
 };
